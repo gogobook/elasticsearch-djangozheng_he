@@ -97,4 +97,6 @@ core.Student.courses: (fields.W340) null has no effect on ManyToManyField.
 (0.000) INSERT INTO "core_university" ("name") VALUES ('PSTU'); args=['PSTU']
 ```
 可以看 handle函式被執行。
-然後把製作courses的程式碼加進來。
+
+然後把製作courses的程式碼加進來。(自行查看程式碼)
+再來是製作students的程式碼，這比較麻煩，得先安裝names(pip install names),然後也得動用到random來分配學校，最後還得將學生與課程連結在一起。
