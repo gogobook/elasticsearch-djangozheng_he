@@ -101,6 +101,6 @@ core.Student.courses: (fields.W340) null has no effect on ManyToManyField.
 然後把製作courses的程式碼加進來。(自行查看程式碼)
 再來是製作students的程式碼，這比較麻煩，得先安裝names(pip install names),然後也得動用到random來分配學校，最後還得將學生與課程連結在一起。在這裡要把xrange 改為range，不然會報錯。學生是使用mommy.perpare來製作資料，最後才用Student.objects.bulk_create()來一次製作。我們還得加入一個command-line option以指定要製作幾個學生。(請看add_arguments方法。)
 
-在最一步時，我們需連結學生與課程, ForeignKeys的一個值並無法被知道，且我們無法插入一個列到一個表中當
+在最一步時，我們需連結學生與課程, ForeignKeys的一個值並無法被知道，且我們無法插入一個列到一個表中當我們正在建立Students:ManyToMany course<-->student關係映射到資料表中時，表中須維持二個外鍵，一個在course表中，另一個在student表中，(見程式碼)如你可見，我們定義了"ThroghModel"的中間資料表，然為每個學生加上課程，這是統包插入，就像我們之前做過，課程的選擇是隨機的，這可能使得學生的選課有重覆，這會造成資料庫關係的錯誤，因此我們檢查'new course'是否已經被加到course_already_linked，假如有(重複)，就別加進去了，跳往下一個迴圈。
 
 
