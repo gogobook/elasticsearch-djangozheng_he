@@ -130,4 +130,48 @@ Plan:
  一如Student是這個系統的一個主要實體，我們將在`core/models.py`中儲存mapping。（見程式碼）
  主要在class Meta:中作 mapping的描述。
  
+ 在此我們加上`es_index_name`,`es_type_name`與`es_mapping`到model中的Meta class中一個串列，這會禁止把任何東西都加到options，然而我不認為某人會想要使用`es_index_name`作為某個Django-models內的某個東西的名字。
+ 
+ 一如大部分的index fields 名稱是等同於models 內的fields，這應該對你而言是直觀的，我只將描述一部分。
+
+* `university`: We plan to use this field in facets and filtering. We could've used `university_name` only, but we put it here as an object for two reasons; To mirror the fact it's really a distinct entity in the database, and to be able to show how to put an object to the mapping.
+* `course_names`:Elasticsearch 並不需要指定array，我們只是把字串丟進來，其結果將會是字串。
+
+然後我們把焦點轉向指令`push-to-index.py`的程式碼。
+```python
+from elasticsearch.client import IndicesClient
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from core.models import Student
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        self.recreate_index()
+    def recreate_index(self):
+        indices_client = IndicesClient(client=settings.ES_CLIENT)
+        index_name = Student._meta.es_index_name
+        if indices_client.exists(index_name):
+            indices_client.delete(index=index_name)
+        indices_client.create(index=index_name)
+        indices_client.put_mapping(
+            doc_type=Student._meta.es_type_name,
+            body=Student._meta.es_mapping,
+            index=index_name
+        )
+ ```
+ recreate_index方法做了幾件事。
+ 
+ 1. 建立`IndicesClient`實例，然後用這個實例的方法(indices_client.exists, indices_client.create, indices_client.put_mapping, indices_client.put_mappingindices_client.delete)來操作。
+ 2. 檢查`index_name`是否已存在，如果存在則予以刪除。
+ 3. 建立新的index
+ 4. Puts mapping to that index.
+
+在執行之前你得安裝elasticsearch、requests套件，並且在settings中(project/conf/base.py)設定elasticsearch的連線。更進一步的elasticsearch設定，請看elasticsearch的api 文件。
+
+此外為節省你的時間，作者使用了elasticsearch api 中的bulk helpers，來進行整批式的操作。此處的核心技術是轉換資料庫資料到json, 然後將json資料流到elasticsearch伺服器中。
+首先更新指令，增加了二個方法--push_db_to_index, convert_for_bulk. convert_for_bulk是給push_db_to_index用的，convert_for_bulk直接使用了Student.objects.all()中的物件作為參數，然後執行物件的方法es_repr()並且使用了metadata來加以更新(這一步看不太懂，感覺上是python閉包的做法, 要找一下update的方法是哪來的? update方法，應該是字典物件自帶的方法，所以可以直接使用)。es_repr()方法主要是做為序列化使用
+
+
+
+
+ 
  
