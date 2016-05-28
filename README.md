@@ -168,8 +168,9 @@ class Command(BaseCommand):
 在執行之前你得安裝elasticsearch、requests套件，並且在settings中(project/conf/base.py)設定elasticsearch的連線。更進一步的elasticsearch設定，請看elasticsearch的api 文件。
 
 此外為節省你的時間，作者使用了elasticsearch api 中的bulk helpers，來進行整批式的操作。此處的核心技術是轉換資料庫資料到json, 然後將json資料流到elasticsearch伺服器中。
-首先更新指令，增加了二個方法--push_db_to_index, convert_for_bulk. convert_for_bulk是給push_db_to_index用的，convert_for_bulk直接使用了Student.objects.all()中的物件作為參數，然後執行物件的方法es_repr()並且使用了metadata來加以更新(這一步看不太懂，感覺上是python閉包的做法, 要找一下update的方法是哪來的? update方法，應該是字典物件自帶的方法，所以可以直接使用)。es_repr()方法主要是做為序列化使用
+首先更新指令，增加了二個方法--push_db_to_index, convert_for_bulk. convert_for_bulk是給push_db_to_index用的，convert_for_bulk直接使用了Student.objects.all()中的物件作為參數，然後執行物件的方法es_repr()並且使用了metadata來加以更新(這一步看不太懂，感覺上是python閉包的做法, 要找一下update的方法是哪來的? update方法，應該是字典物件自帶的方法，所以可以直接使用)。es_repr()方法主要是做為序列化使用(將資料字典化)。
 
+##Add functional frontend items, write queries, allow the index to update, and discuss a bonus tip. 
 
 
 
