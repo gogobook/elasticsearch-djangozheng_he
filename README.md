@@ -103,4 +103,13 @@ core.Student.courses: (fields.W340) null has no effect on ManyToManyField.
 
 在最一步時，我們需連結學生與課程, ForeignKeys的一個值並無法被知道，且我們無法插入一個列到一個表中當我們正在建立Students:ManyToMany course<-->student關係映射到資料表中時，表中須維持二個外鍵，一個在course表中，另一個在student表中，(見程式碼)如你可見，我們定義了"ThroghModel"的中間資料表，然為每個學生加上課程，這是統包插入，就像我們之前做過，課程的選擇是隨機的，這可能使得學生的選課有重覆，這會造成資料庫關係的錯誤，因此我們檢查'new course'是否已經被加到course_already_linked，假如有(重複)，就別加進去了，跳往下一個迴圈。
 
+##Add data to the elasticsearch index in bulk, write a basic command, and add a mapping to the elasticsearch index.
+Plan:
 
+    1. Write a basic command.
+    2. Add mapping to the elasticsearch index.
+    3. Push all data to the index in bulk.
+    4. Check results.
+ 
+ 這些是第三部分要做的事，寫一個指令，映射elasticsearch，把資料塞到elasticsearch，檢查結果。
+ 
