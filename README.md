@@ -112,6 +112,22 @@ Plan:
     4. Check results.
  
  這些是第三部分要做的事，寫一個指令，映射elasticsearch，把資料塞到elasticsearch，檢查結果。
- ###寫一個指令
+ ###寫一個指令 push-to-index
+ `cp dummy-data.py push-to-index.py` handle 方法留著，其他刪掉，然後讀一下elasticsearch 的mapping的文件。以下是說明文件的內容。
+ mapping 是一個定義的程序，指明一個document及其所包含的fields，被儲存及索引。例如，使用mapping 以定義：
+ 
+ * which string fields should be treated as full text fields. 
+ * which fields contain numbers, dates, or geolocations. 
+ * whether the values of all fields in the document should be indexed into the catch-all \_all field.
+ * the format of date values.
+ * custom rules to control the mapping for dynamically added fields. 
+ Example mapping 
+ ![](2016-05-28 15-51-06 的螢幕擷圖.png)
+
+
+ ![](2016-05-28 15-53-14 的螢幕擷圖.png)
+ 
+ 一如Student是這個系統的一個主要實體，我們將在`core/models.py`中儲存mapping。（見程式碼）
+ 主要在class Meta:中作 mapping的描述。
  
  
