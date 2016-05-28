@@ -112,4 +112,6 @@ Plan:
     4. Check results.
  
  這些是第三部分要做的事，寫一個指令，映射elasticsearch，把資料塞到elasticsearch，檢查結果。
+ ###寫一個指令
+ 
  
