@@ -328,7 +328,32 @@ class HomePageView(TemplateView):
                             }
                         }
      ```
-     
+這是CBV，HomePageView是TemplateView的子類化，HomePageView還包含了6個方法，分別是：
+```
+def get_context_date(self, **kwargs):
+def convert_hit_to_template(self, hit1):
+def facet_url_args(self, url_args, field_name, field_value):
+def prepare_facet_data(self, aggregations_dice, get_args):
+def gen_es_query(self, request):
+def get_sql_context(self):
+```
+這讓template的繪出更加容易。`template_name`類別屬性定義了要被使用的template的名字，你可以在`project/templates`資料夾內找到它。
+讓我們一個一個描述方法：
+
+* `get_context_data` 用以產出(`gen_es_query`)並執行 elasticsearch query, 並且準備在template被繪出的data(`prepare_facet_data` and `convert_hit_to_template`)
+* `gen_es_query` 自GET-parameters產生elasticsearch filters
+* `prepare_facet_data` 轉換elasticsearch aggregation dict以使容易呈現在template中，我們產生URL args 以使使用者能夠點選連結以增加或刪除過濾器，同時我們標記過濾器是否啟動，並留下計數。
+* `convert_hit_to_template`自elasticsearch documents取出`_source`及primary key, 這是一種在template寫比較少的方法。
+
+通常的工作流如下：
+1. 使用者進入 index page.
+2. 使用者點選一些過濾器
+3. 使用者被重導向新的url，並伴隨一新的GET-parameters。
+4. View 使用GET-parameters以產生新的query並輸出新的query results到template
+5. 使用者檢視新的資料
+
+你可能注意到了，所有的資料都是來自Elasticsearch 。
+**
                 
             
                 
