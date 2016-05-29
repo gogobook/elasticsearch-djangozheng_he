@@ -284,6 +284,51 @@ class HomePageView(TemplateView):
                 
             def prepare_facet_data(self, aggregations_dict, get_args):
                 resp = {}
+                for area in aggregations_dict.keys():
+                    resp[area] = []
+                    if area == 'age':
+                        resp[area] = aggregation_dict[area]['buckets']
+                        continue
+                    for item in aggregations_dict[area]['buckets']:
+                        url_args, is_active=self.facet_url-args(
+                            url_args=deepcopy(get_args.dict()),
+                            field_name=area,
+                            field_value=item['key']
+                        )
+                        resp[area].append({
+                            'url_args': urlencode(url_args),
+                            'name': item['key'],
+                            'count': item['doc_count'],
+                            'is_activ': is_active
+                        })
+                    return resp
+                
+                def gen_es_query(self, request):
+                    req_dict = deepcopy(request.GET.dict())
+                    if not req_dict:
+                        return {'match_all':{}}
+                    filters = []
+                    for field_name in req_dict.keys():
+                        if '__' in field_name:
+                            filter_field_name = field_name.replace('__','.')
+                        else:
+                            filter_field_name = field_name
+                        for field_value in req_dict[field_name].split('.'):
+                            if not field_value:
+                                continue
+                            filters.append(
+                                {'term': {filter_field_name: field_value},}
+                            )
+                        return {
+                            'filtered': {
+                                'query': {'match_all': {}},
+                                'filter': {
+                                    'bool': {'must': filters}
+                                }
+                            }
+                        }
+     ```
+     
                 
             
                 
