@@ -216,11 +216,9 @@ def autocomplete_view(request):
     resp = client.suggest(
         index='django',
         body={
-            'name_complete':{
+            'name_complete': {
                 "text": query,
-                "completion": {
-                    "field": 'name_complete',
-                }
+                "completion": {"field": 'name_complete',}
             }
         }
     )
