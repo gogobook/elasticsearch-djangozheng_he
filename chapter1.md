@@ -10,4 +10,25 @@
 ### Suggester
 藉由使用一個suggester，suggester 功能可建議看起來相似的term。部分的建議功能仍在發展中。
 suggest request part不只定義在`_search` request的query part，也可透過REST `suggest` endpoint來使用。
+```js
+curl -s -XPOST 'localhost:9200/_search' -d '{
+  "query" : {
+    ...
+  },
+  "suggest" : {
+    ...
+  }
+}'
+```
 
+Suggest request使用`_suggest` endpoint應省略`suggest` element, which is only used if the suggest request is part of a search.
+```js
+curl -XPOST 'localhost:9200/_suggest' -d '{
+  "my-suggestion" : {
+    "text" : "the amsterdma meetpu",
+    "term" : {
+      "field" : "body"
+    }
+  }
+}'
+```
