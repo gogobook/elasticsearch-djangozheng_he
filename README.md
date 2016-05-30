@@ -4,7 +4,7 @@
 
 主要有四個部分
 1. 建立django的骨架，特別是models.py內的內容。
-2. 建指令，生成資料
+2. 建指令，利用model-mommy套件生成資料庫資料
 3. 建指令，映射elasticsearch，將資料送入elasticsearch
 4. 完善django功能，urls->views->template
 
