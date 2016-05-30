@@ -6,10 +6,10 @@
 1. 建立django的骨架，特別是models.py內的內容。
 2. 建指令，利用model-mommy套件生成資料庫資料
 3. 建指令，映射elasticsearch，將資料送入elasticsearch
-4. 完善django功能，urls->views->template
+4. 完善django功能，urls->views->template. (這一部分有些複雜，也許分成二部分較好。)
 
 ## 建立django的骨架，並加上models.py
-目前伺服器好像掛掉了。^^
+目前伺服器好像掛掉了。^^||
 
 ## 建立指令，以生成資料
 
@@ -103,7 +103,7 @@ core.Student.courses: (fields.W340) null has no effect on ManyToManyField.
 
 在最一步時，我們需連結學生與課程, ForeignKeys的一個值並無法被知道，且我們無法插入一個列到一個表中當我們正在建立Students:ManyToMany course<-->student關係映射到資料表中時，表中須維持二個外鍵，一個在course表中，另一個在student表中，(見程式碼)如你可見，我們定義了"ThroghModel"的中間資料表，然為每個學生加上課程，這是統包插入，就像我們之前做過，課程的選擇是隨機的，這可能使得學生的選課有重覆，這會造成資料庫關係的錯誤，因此我們檢查'new course'是否已經被加到course_already_linked，假如有(重複)，就別加進去了，跳往下一個迴圈。
 
-##Add data to the elasticsearch index in bulk, write a basic command, and add a mapping to the elasticsearch index.
+## 3rd Add data to the elasticsearch index in bulk, write a basic command, and add a mapping to the elasticsearch index.
 Plan:
 
     1. Write a basic command.
@@ -170,7 +170,7 @@ class Command(BaseCommand):
 此外為節省你的時間，作者使用了elasticsearch api 中的bulk helpers，來進行整批式的操作。此處的核心技術是轉換資料庫資料到json, 然後將json資料流到elasticsearch伺服器中。
 首先更新指令，增加了二個方法--push_db_to_index, convert_for_bulk. convert_for_bulk是給push_db_to_index用的，convert_for_bulk直接使用了Student.objects.all()中的物件作為參數，然後執行物件的方法es_repr()並且使用了metadata來加以更新(這一步看不太懂，感覺上是python閉包的做法, 要找一下update的方法是哪來的? update方法，應該是字典物件自帶的方法，所以可以直接使用)。es_repr()方法主要是做為序列化使用(將資料字典化)。
 
-##Add functional frontend items, write queries, allow the index to update, and discuss a bonus tip. 
+## 4th Add functional frontend items, write queries, allow the index to update, and discuss a bonus tip. 
 
 我們將在django view中使用elasticsearch, 下面是request-response。
 
@@ -185,8 +185,10 @@ request -> url router -> view -> response
 2. views.py
 3. templates/{template name}.html
 
-在最後，我們將有一個具有「自動補全」的學生搜尋功能，具過濾的切面，並且有額外的學生細節。
-首先，我們打開「開發用」伺服器，在這一階段完成時，我們會把它關掉。
+在最後，我們將有一個具有「自動補全」的學生搜尋功能的網頁，具過濾的切面，並且有額外的學生細節。
+
+首先，我們打開「開發用」伺服器。
+
 然後，我們在url router上，加上一些邏輯。
 ```python
 from core.veiws import autocomplete_view, student_detail, HomePageView
@@ -198,10 +200,10 @@ urlpatterns = [
     url(r'^$', HomePageView.as_view(), name='index-view'),
 ]
 ```
-如你所見，我們加了三個新的urls,一個執行自動補全queries，一個取得student details，一個做為主頁。你可以看到shell有錯誤，這是正常的，因為core.views 還沒完成。讓我們把它完成。
+如你所見，我們加了三個新的urls,一個執行自動補全queries，一個取得student details，一個做為主頁。你可以看到shell有錯誤，這是正常的，因為core.views 還沒完成。讓我們把view完成。
 ```python
 import json
-from urllib.parse import urlencode
+from urllib.parse import urlencode #這裡要注意
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render
@@ -329,7 +331,7 @@ class HomePageView(TemplateView):
                         }
      ```
 這是CBV，HomePageView是TemplateView的子類化，HomePageView還包含了6個方法，分別是：
-```
+```python
 def get_context_date(self, **kwargs):
 def convert_hit_to_template(self, hit1):
 def facet_url_args(self, url_args, field_name, field_value):
@@ -352,12 +354,12 @@ def get_sql_context(self):
 4. View 使用GET-parameters以產生新的query並輸出新的query results到template
 5. 使用者檢視新的資料
 
-你可能注意到了，所有的資料都是來自Elasticsearch 。
+你可能注意到了，頁面上所有的資料都是來自Elasticsearch，而不是直接來自資料庫 。
 
-同時，一旦有人使用了在網頁右上角的「自動補全」欄位，並且點選了建議的學生，這將重導向學生細節網頁。我們在此使用了資料庫的資料。來自我之前的經驗，這會是相當手工的方式，去處理lag，資料在資料庫更新且在搜尋索引中更新，我們必須記得elasticsearch是近乎即時的，但不完全即時，這樣的方式可以確保使用者看到正確的資料，即時搜尋索引中的版本已經過時了。
+同時，一旦有人使用了在網頁右上角的「自動補全」欄位，並且點選了建議的學生，這將重導向學生細節網頁。我們在此使用了資料庫的資料。來自我之前的經驗，這會是相當手工的方式，去處理延遲(lag)，資料在資料庫更新且在搜尋索引中更新，我們必須記得elasticsearch是近乎即時的，但不完全即時，這樣的方式可以確保使用者看到正確的資料，即使搜尋索引中的版本已經過時了。
 ###確認索引是最新的，當一個新的資料被加入、更新或刪除。
 
-在這個教學之前的部分，我們已經將資料整批次地塞到elasticsearch index。然而，所有的事務都是經常改變的，所以某些學生得更新他們的資料，我們必須處理更新。我們有三個選擇：
+在這個教學之前的部分，我們已經將資料整批次地塞到elasticsearch index。然而，所有的事務都是經常改變的，所以某些學生會更新他們的資料(更新課程、升上高一年級)，我們必須處理更新。我們有三個選擇：
 1. 即時更新
 2. 半即時更新
 3. 週期性整批次更新
