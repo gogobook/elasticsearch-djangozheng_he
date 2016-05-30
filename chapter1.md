@@ -60,3 +60,5 @@ curl -XPOST 'localhost:9200/_suggest' -d '{
   ...
 ]
 ```
+### 直接跳Completion suggester
+稍微看一下，原文應該是使用completion suggester。
