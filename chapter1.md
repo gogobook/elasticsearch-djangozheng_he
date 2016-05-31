@@ -5,8 +5,10 @@
 
 ## 2. 其實很多東西有些難度
 比如，class Meta: 的使用，再來像django-extention、model-mommy的使用，甚至elasticsearch的部分，其實都不算簡單。而且都滿有價值的。
+
 ## 3. suggest,自動補全，很棒！
-然後我看了一下api 文件，看不懂? 有些太簡單了，看官網文件才發現好多資料喔！真的超棒的，但真的得花時間了解。原文中使用suggest來達成自動補全的功能，但最後導向的，卻是由資料庫出來的資料。
+然後我看了一下api 文件，看不懂? 有些太簡單了，看elasticsearch官網文件才發現好多資料喔！真的超棒的，但真的得花時間了解。教學的原文中使用suggest來達成自動補全的功能，但最後導向的，卻是由資料庫出來的資料。
+
 ### [Suggester](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)
 藉由使用一個suggester，suggester 功能可建議看起來相似的term。部分的建議功能仍在發展中。
 suggest request part不只定義在`_search` request的query part，也可透過REST `suggest` endpoint來使用。
