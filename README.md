@@ -2,6 +2,8 @@
 
 這是來自網路上的 [Mykyta Khliestov](https://qbox.io/blog/author/alex-khliestov)[blog](https://qbox.io/blog/how-to-elasticsearch-python-django-part1)的文章\(共有四篇\)的簡單筆記，主要說明elasticsearch與django的整合使用的一個例子，以便個人複習使用。
 
+由於有提到 model mommy 的中文的教學，使得本文的google search排在滿前面的，因此我會補上一些model mommy的資料，有問題，有意見，有指正的，請發issues，我會儘快回答。另由於本文翻譯並未取得原作者同意，所以授權的部分就請隨便。
+
 主要有四個部分
 
 1. 建立django的骨架，特別是models.py內的內容。
